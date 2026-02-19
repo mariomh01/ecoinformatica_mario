@@ -1,5 +1,5 @@
 ---
-title: "Entregable Reproducibilidad"
+title: "Entregable Reproducibilidad-control versiones"
 author: "Mario"
 date: "`r Sys.Date()`"
 output: html_document
@@ -32,9 +32,9 @@ Puede consultar las características de la especie de estudio en el siguiente en
 #Análisis de datos
 
 ```{r}
-datos_TFG<- read.csv("C:/Users/mario/Desktop/Extracto_TFG_Mario.csv")
+datos_TFG<- read.csv("C:/Users/mario/Desktop/Repositorio_Git_Mario/Extracto_TFG_Mario.csv")
 
-df<- read_delim("C:/Users/mario/Desktop/Extracto_TFG_Mario.csv", delim = ";")
+df<- read_delim("C:/Users/mario/Desktop/Repositorio_Git_Mario/Extracto_TFG_Mario.csv", delim = ";")
 
 datos_listos <- df %>%
   mutate(across(c(distancia, fruto_Viejo, fruto_nuevo, fruto, 
@@ -69,12 +69,12 @@ datos_grafico <- datos_densidad %>%
   mutate(SE = SD_Densidad / sqrt(n))
 
 ggplot(datos_grafico, aes(x = distancia, y = Media_Densidad)) +
-  geom_line(color = "darkgreen", size = 1) +
-  geom_point(color = "darkgreen", size = 3) +
+  geom_line(color = "darkblue", size = 1) +
+  geom_point(color = "darkblue", size = 3) +
  
   geom_errorbar(aes(ymin = Media_Densidad - SD_Densidad, 
                     ymax = Media_Densidad + SD_Densidad), 
-                width = 0.2, color = "darkgreen") +
+                width = 0.2, color = "darkblue") +
   theme_minimal() +
   labs(title = "Densidad media de semillas por distancia",
        x = "Distancia(m)",
@@ -99,6 +99,8 @@ ggplot(datos_con_planta, aes(x = Planta, y = densidad_m2, fill = Planta)) +
        y = "Densidad (semillas/m²)") +
   theme(legend.position = "none") # Quitar leyenda si el eje X ya es claro
 ```
+
+La alta densidad del banco de semillas de la especie de estudion debe tenerse en cuenta al planificar y ejecutar protocolos de control de la misma, especialmente si se trata de eliminar la parte aérea de la planta, ya que tal densidad del banco de semillas supone un alto potencial de regeneración
 
 Mario Martínez Hernández
 
