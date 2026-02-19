@@ -1,0 +1,2 @@
+Documento de Mario
+esto es un texto añadido para ir mejorando con Git

@@ -1,0 +1,105 @@
+---
+title: "Entregable Reproducibilidad"
+author: "Mario"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r librerias, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(readr)
+```
+
+\#**Análisis del Banco de semillas de *Retama monosperma***
+
+##Introducción
+
+En este trabajo se ha recogido un extracto del total de la base de datos completa perteneciente al Trabajo Fin de Grado de Mario Martínez Hernández en la Universidad de Sevilla, año 2025.
+
+Para el análisis se han utilizado los datos del muestreo realizado a finales de 2024 para 4 individuos de *Retama monosperma* de 25 años de edad. Se muestreó cada 0,5m hasta 2m del límite de la copa al exterior.
+
+Puede consultar las características de la especie de estudio en el siguiente enlace: [https://www.florandalucia.es/index.php/retama-monosperma](https://www.url.com)
+
+![Flor de *Retama monosperma*.Florandalucía.es(J.Fuentes)](Retama_monosperma.10.jpg)
+
+#Análisis de datos
+
+```{r}
+datos_TFG<- read.csv("C:/Users/mario/Desktop/Extracto_TFG_Mario.csv")
+
+df<- read_delim("C:/Users/mario/Desktop/Extracto_TFG_Mario.csv", delim = ";")
+
+datos_listos <- df %>%
+  mutate(across(c(distancia, fruto_Viejo, fruto_nuevo, fruto, 
+                  individuales, total),
+                ~as.numeric(str_replace_all(as.character(.), ",", "."))))
+
+datos_densidad <- datos_listos %>%
+  mutate(densidad_m2 = total / 0.07) 
+
+
+resumen_muestras <- datos_densidad %>%
+  group_by(ID_muestra) %>%
+  summarise(
+    Densidad_Media = mean(densidad_m2),
+    SD = sd(densidad_m2),
+    Total_Semillas = sum(total)
+  )
+
+print(head(resumen_muestras))
+```
+
+#Resultados (gráficos)
+
+```{r}
+datos_grafico <- datos_densidad %>%
+  group_by(distancia) %>%
+  summarise(
+    Media_Densidad = mean(densidad_m2),
+    SD_Densidad = sd(densidad_m2),
+    n = n()
+  ) %>%
+  mutate(SE = SD_Densidad / sqrt(n))
+
+ggplot(datos_grafico, aes(x = distancia, y = Media_Densidad)) +
+  geom_line(color = "darkgreen", size = 1) +
+  geom_point(color = "darkgreen", size = 3) +
+ 
+  geom_errorbar(aes(ymin = Media_Densidad - SD_Densidad, 
+                    ymax = Media_Densidad + SD_Densidad), 
+                width = 0.2, color = "darkgreen") +
+  theme_minimal() +
+  labs(title = "Densidad media de semillas por distancia",
+       x = "Distancia(m)",
+       y = "Densidad (semillas/m²)")
+
+
+
+datos_con_planta <- datos_listos %>%
+  mutate(Planta = str_extract(ID_muestra, "CL25_\\d+"))
+
+
+datos_con_planta <- datos_con_planta %>%
+  mutate(densidad_m2 = total / 0.07) # Cambia 0.01 por tu área real
+
+ggplot(datos_con_planta, aes(x = Planta, y = densidad_m2, fill = Planta)) +
+  geom_boxplot(alpha = 0.7) +
+
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  theme_minimal() +
+  labs(title = "Comparación de Densidad de Semillas entre Plantas",
+       x = "ID de la Planta",
+       y = "Densidad (semillas/m²)") +
+  theme(legend.position = "none") # Quitar leyenda si el eje X ya es claro
+```
+
+Mario Martínez Hernández
+
+Ecoinformática. 17/02/2026
